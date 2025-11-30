@@ -1,29 +1,34 @@
 # rust-pract
 
-This repository contains weekly Rust programming exercises and practice projects to learn and improve Rust development skills.
+This repository contains Rust programming exercises and practice projects to learn and improve Rust development skills.
 
 ## Project Structure
 
-Each week's exercise is organized as a separate binary target:
+Each project exercise is organized as a separate binary target:
 
 ```
 src/
-├── week-1-palindrome/
-├── week-2-palindrome/
-└── week-{n}/
+├── palindrome/
+└── ...
 ```
 
 ## Running the Code
 
-To run a specific week's exercise, use the following command:
+To run the first project `[[bin]]` defined in `Cargo.toml`, use the following command:
 
 ```bash
-cargo run --bin week-{n}
+cargo run
+```
+
+To run a specific project exercise, use the following command:
+
+```bash
+cargo run --bin {project-name}
 ```
 
 ### Examples:
 
 ```bash
-# Run week 1 exercise
-cargo run --bin week-1
+# Run longest palindrome project
+cargo run --bin palindrome
 ```

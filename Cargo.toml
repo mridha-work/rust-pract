@@ -6,9 +6,5 @@ edition = "2024"
 [dependencies]
 
 [[bin]]
-name = "week-1"
-path = "src/week-1-palindrome/main.rs"
-
-[[bin]]
-name = "week-2"
-path = "src/week-2-palindrome/main.rs"
+name = "palindrome"
+path = "src/palindrome/main.rs"

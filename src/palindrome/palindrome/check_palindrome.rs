@@ -2,7 +2,7 @@ pub fn expand_check_palindrome(
     chars: &Vec<char>,
     mut left: usize,
     mut right: usize,
-    start: &mut usize,
+    max_pal_start: &mut usize,
     max_pal_size: &mut usize,
 ) {
     let len = chars.len();
@@ -14,7 +14,7 @@ pub fn expand_check_palindrome(
         let current_pal_size = right - left + 1;
         if current_pal_size > *max_pal_size {
             *max_pal_size = current_pal_size;
-            *start = left;
+            *max_pal_start = left;
         }
 
         if left == 0 {

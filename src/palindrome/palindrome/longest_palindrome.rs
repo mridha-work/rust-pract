@@ -1,24 +1,26 @@
-use crate::palindrome::check_palindrome::expand_check_palindrome;
+use super::check_palindrome::expand_check_palindrome;
+use super::dto::{LongestPalindromeInput, LongestPalindromeOutput};
 
-pub fn find_longest_palindrome(s: &String) -> String {
-    if s.is_empty() {
-        return "".to_string();
+pub fn find_longest_palindrome(input: LongestPalindromeInput) -> LongestPalindromeOutput {
+    if input.is_empty() {
+        return LongestPalindromeOutput::default();
     }
 
-    let mut start = 0;
+    let mut max_pal_start = 0;
     let mut max_pal_size = 1;
 
+    let s = input.string;
     let len = s.len();
     let chars = s.chars().collect::<Vec<char>>();
     for i in 0..len {
         // odd length palindromes (center is single character)
-        expand_check_palindrome(&chars, i, i, &mut start, &mut max_pal_size);
+        expand_check_palindrome(&chars, i, i, &mut max_pal_start, &mut max_pal_size);
 
         // even length palindromes (center is two characters)
-        if i + 1 < len {
-            expand_check_palindrome(&chars, i, i + 1, &mut start, &mut max_pal_size);
-        }
+        expand_check_palindrome(&chars, i, i + 1, &mut max_pal_start, &mut max_pal_size);
     }
 
-    return s[start..start + max_pal_size].to_string();
+    let longest_palindrome = s[max_pal_start..max_pal_start + max_pal_size].to_string();
+
+    LongestPalindromeOutput::new(s.to_string(), longest_palindrome)
 }

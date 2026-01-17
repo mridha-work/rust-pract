@@ -1,7 +1,8 @@
-use crate::stdio::{input, output};
 mod check_palindrome;
 mod dto;
 mod longest_palindrome;
+
+use crate::stdio::{input, output};
 
 pub fn run_longest_palindrome() {
     output::write_to_console("Enter a string to find the longest palindrome: ");

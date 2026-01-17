@@ -1,13 +1,28 @@
-use crate::core::entity::user::{ListUsersQueryParam, Pagination, User, UserList};
+use crate::core::entity::user::{
+    CreateUserRequest, ListUsersQueryParam, Pagination, UpdateUserRequest, User, UserList,
+};
+use crate::core::ports::service::UserServicePort;
 use crate::core::services::users::UserService;
 use std::error::Error;
 
-impl UserService {
-    pub fn get_user_by_id(&self, id: i64) -> Result<Option<User>, Box<dyn Error>> {
+impl UserServicePort for UserService {
+    fn create_user(&self, req: CreateUserRequest) -> Result<User, Box<dyn Error>> {
+        // validate request
+        if req.name.trim().is_empty() {
+            return Err("Name cannot be empty".into());
+        }
+        if !req.email.contains('@') {
+            return Err("Invalid email format".into());
+        }
+
+        self.repository.create(&req.name.trim(), &req.email.trim())
+    }
+
+    fn get_user_by_id(&self, id: i64) -> Result<Option<User>, Box<dyn Error>> {
         self.repository.find_by_id(id)
     }
 
-    pub fn list_users(&self, query: ListUsersQueryParam) -> Result<UserList, Box<dyn Error>> {
+    fn list_users(&self, query: ListUsersQueryParam) -> Result<UserList, Box<dyn Error>> {
         // validate query param
         let mut limit = 100;
         if let Some(q_limit) = query.limit {
@@ -60,5 +75,30 @@ impl UserService {
                 total_items: total_users,
             },
         })
+    }
+
+    fn update_user(&self, id: i64, req: UpdateUserRequest) -> Result<User, Box<dyn Error>> {
+        // validate request
+        let mut name: Option<&str> = None;
+        if let Some(ref req_name) = req.name {
+            if req_name.trim().is_empty() {
+                return Err("Name cannot be empty".into());
+            }
+            name = Some(req_name.trim());
+        }
+
+        let mut email: Option<&str> = None;
+        if let Some(ref req_email) = req.email {
+            if !req_email.contains('@') {
+                return Err("Invalid email format".into());
+            }
+            email = Some(req_email.trim());
+        }
+
+        self.repository.update(id, name, email)
+    }
+
+    fn delete_user(&self, id: i64) -> Result<(), Box<dyn Error>> {
+        self.repository.delete(id)
     }
 }

@@ -1,15 +1,14 @@
-mod create;
-mod delete;
-mod read;
-mod update;
-use crate::core::ports::repository::UserRepository;
+mod implementation;
+
+use crate::core::ports::repository::UserRepositoryPort;
 use std::sync::Arc;
+
 pub struct UserService {
-    repository: Arc<dyn UserRepository>,
+    repository: Arc<dyn UserRepositoryPort>,
 }
 
 impl UserService {
-    pub fn new(repository: Arc<dyn UserRepository>) -> Self {
+    pub fn new(repository: Arc<dyn UserRepositoryPort>) -> Self {
         Self { repository }
     }
 }

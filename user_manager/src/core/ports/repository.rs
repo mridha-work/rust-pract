@@ -1,7 +1,7 @@
 use crate::core::entity::user::User;
 use std::error::Error;
 
-pub trait UserRepository: Send + Sync {
+pub trait UserRepositoryPort: Send + Sync {
     fn create(&self, name: &str, email: &str) -> Result<User, Box<dyn Error>>;
     fn find_by_id(&self, id: i64) -> Result<Option<User>, Box<dyn Error>>;
     fn count_all(&self, email_keyword: Option<&str>) -> Result<i64, Box<dyn Error>>;

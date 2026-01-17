@@ -1,5 +1,5 @@
 use crate::core::entity::user::User;
-use crate::core::ports::repository::UserRepository;
+use crate::core::ports::repository::UserRepositoryPort;
 use rusqlite::{Connection, OptionalExtension};
 use std::error::Error;
 use std::sync::{Arc, Mutex};
@@ -14,7 +14,7 @@ impl SqliteUserRepository {
     }
 }
 
-impl UserRepository for SqliteUserRepository {
+impl UserRepositoryPort for SqliteUserRepository {
     fn create(&self, name: &str, email: &str) -> Result<User, Box<dyn Error>> {
         let id = {
             let conn = self.conn.lock().unwrap();

@@ -7,7 +7,7 @@ This repository contains Rust programming exercises and practice projects to lea
 Each project exercise is organized as a separate folders with their own `Cargo.toml`:
 
 ```
-.
+./
 ├── palindrome/
 ├── user_manager/
 └── ...

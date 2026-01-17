@@ -4,31 +4,28 @@ This repository contains Rust programming exercises and practice projects to lea
 
 ## Project Structure
 
-Each project exercise is organized as a separate binary target:
+Each project exercise is organized as a separate folders with their own `Cargo.toml`:
 
 ```
-src/
+.
 ├── palindrome/
+├── user_manager/
 └── ...
 ```
 
 ## Running the Code
 
-To run the first project `[[bin]]` defined in `Cargo.toml`, use the following command:
+To run any of the project, go to the intended project folder, 
 
+and then run with: 
 ```bash
 cargo run
-```
-
-To run a specific project exercise, use the following command:
-
-```bash
-cargo run --bin {project-name}
 ```
 
 ### Examples:
 
 ```bash
 # Run longest palindrome project
-cargo run --bin palindrome
+cd palindrome/
+cargo run
 ```

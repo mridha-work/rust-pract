@@ -1,8 +1,17 @@
-use crate::core::entity::errors::DefaultError;
 use crate::core::entity::user::{CreateUserRequest, ListUsersQueryParam, UpdateUserRequest};
 use crate::core::ports::service::UserServicePort;
-use actix_web::{HttpResponse, Responder, web};
+use crate::infra::api::rest::errors::DefaultError;
+use actix_web::{HttpResponse, Responder, get, web};
 use std::sync::Arc;
+
+pub async fn default_handler() -> impl Responder {
+    HttpResponse::NotFound().json(DefaultError::new("Path does not exist"))
+}
+
+#[get("/ping")]
+pub async fn ping() -> impl Responder {
+    HttpResponse::Ok().body("ok!\n")
+}
 
 pub async fn create_user(
     service: web::Data<Arc<dyn UserServicePort>>,

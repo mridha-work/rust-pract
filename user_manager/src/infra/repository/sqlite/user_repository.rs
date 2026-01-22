@@ -50,16 +50,17 @@ impl UserRepositoryPort for SqliteUserRepository {
         Ok(user)
     }
 
-    fn count_all(&self, email_keyword: Option<&str>) -> Result<i64, Box<dyn Error>> {
+    fn count_all(&self, keyword: Option<&str>) -> Result<i64, Box<dyn Error>> {
         let conn = self.conn.lock().unwrap();
 
         let mut query = String::from("SELECT COUNT(*) FROM users");
         let mut params: Vec<Box<dyn rusqlite::ToSql>> = vec![];
 
-        if let Some(email) = email_keyword {
-            query += " WHERE LOWER(email) LIKE ?";
-            let email_pattern = format!("%{}%", email.to_lowercase());
-            params.push(Box::new(email_pattern));
+        if let Some(keyword) = keyword {
+            query += " WHERE (LOWER(name) LIKE ? OR LOWER(email) LIKE ?)";
+            let keyword_pattern = format!("%{}%", keyword.to_lowercase());
+            params.push(Box::new(keyword_pattern.clone()));
+            params.push(Box::new(keyword_pattern));
         }
 
         let mut stmt = conn.prepare(&query)?;
@@ -75,17 +76,18 @@ impl UserRepositoryPort for SqliteUserRepository {
         &self,
         limit: i64,
         offset: i64,
-        email_keyword: Option<&str>,
+        keyword: Option<&str>,
     ) -> Result<Vec<User>, Box<dyn Error>> {
         let conn = self.conn.lock().unwrap();
 
         let mut query = String::from("SELECT id, name, email, created_at, updated_at FROM users");
         let mut params: Vec<Box<dyn rusqlite::ToSql>> = vec![];
 
-        if let Some(email) = email_keyword {
-            query += " WHERE LOWER(email) LIKE ?";
-            let email_pattern = format!("%{}%", email.to_lowercase());
-            params.push(Box::new(email_pattern));
+        if let Some(keyword) = keyword {
+            query += " WHERE (LOWER(name) LIKE ? OR LOWER(email) LIKE ?)";
+            let meyword_pattern = format!("%{}%", keyword.to_lowercase());
+            params.push(Box::new(meyword_pattern.clone()));
+            params.push(Box::new(meyword_pattern));
         }
 
         query += " LIMIT ? OFFSET ?";

@@ -24,7 +24,7 @@ impl UserServicePort for UserService {
 
     fn list_users(&self, query: ListUsersQueryParam) -> Result<UserList, Box<dyn Error>> {
         // validate query param
-        let mut limit = 100;
+        let mut limit = 10;
         if let Some(q_limit) = query.limit {
             if q_limit > 0 && q_limit <= 1000 {
                 limit = q_limit
@@ -38,15 +38,15 @@ impl UserServicePort for UserService {
             }
         }
 
-        let mut email_keyword: Option<&str> = None;
-        if let Some(ref q_email) = query.email {
-            if !q_email.trim().is_empty() {
-                email_keyword = Some(q_email.trim());
+        let mut keyword: Option<&str> = None;
+        if let Some(ref q_keyword) = query.keyword {
+            if !q_keyword.trim().is_empty() {
+                keyword = Some(q_keyword.trim());
             }
         }
 
         // get total users
-        let total_users = self.repository.count_all(email_keyword)?;
+        let total_users = self.repository.count_all(keyword)?;
 
         // early return if zero
         if total_users == 0 {
@@ -61,7 +61,7 @@ impl UserServicePort for UserService {
         }
 
         // get users
-        let users = self.repository.find_all(limit, offset, email_keyword)?;
+        let users = self.repository.find_all(limit, offset, keyword)?;
 
         // calculate pagination
         let current_page = (offset / limit) + 1;

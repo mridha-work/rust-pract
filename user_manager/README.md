@@ -20,8 +20,21 @@ GET /ping
 2. List Users
 Retrieve list of users recorded in the database `users` table
 ```
-GET /api/users?limit={limit}&offset={offset}=email={email_keyword}
+GET /api/users?limit={limit}&offset={offset}&keyword={keyword}
 ```
+query param:
+  - limit: i64
+  	- optional
+	- min: 1
+	- max: 1000
+	- default: 10
+  - offset: i64
+  	- optional
+	- min: 0
+	- default: 0
+  - keyword: String
+	- optional
+	- filter based on either user's `name` or `email`
 
 3. Get User by Id
 Retrieve single user data by its `id` in path param
@@ -48,8 +61,8 @@ PUT /api/users/{id}
 
 req body:
 {
-	"name": "string, required",
-	"email": "string, required, unique, must follow email format (have '@')"
+	"name": "string, optional",
+	"email": "string, optional, unique, must follow email format (have '@')"
 }
 ```
 

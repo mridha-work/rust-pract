@@ -38,5 +38,5 @@ pub struct UpdateUserRequest {
 pub struct ListUsersQueryParam {
     pub limit: Option<i64>,
     pub offset: Option<i64>,
-    pub email: Option<String>,
+    pub keyword: Option<String>,
 }

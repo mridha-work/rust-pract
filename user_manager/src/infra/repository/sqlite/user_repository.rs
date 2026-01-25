@@ -19,7 +19,7 @@ impl UserRepositoryPort for SqliteUserRepository {
         let id = {
             let conn = self.conn.lock().unwrap();
             conn.execute(
-                "INSERT INTO users (name, email) VALUES (?1, ?2)",
+                "INSERT INTO users (name, email) VALUES (?, ?)",
                 &[name, email],
             )?;
 
@@ -32,13 +32,13 @@ impl UserRepositoryPort for SqliteUserRepository {
 
     fn find_by_id(&self, id: i64) -> Result<Option<User>, Box<dyn Error>> {
         let conn = self.conn.lock().unwrap();
-        let mut stmt = conn
-            .prepare("SELECT id, name, email, created_at, updated_at FROM users WHERE id = ?1")?;
+        let mut stmt =
+            conn.prepare("SELECT id, name, email, created_at, updated_at FROM users WHERE id = ?")?;
 
         let user = stmt
             .query_row([id], |row| {
                 Ok(User {
-                    id: Some(row.get(0)?),
+                    id: row.get(0)?,
                     name: row.get(1)?,
                     email: row.get(2)?,
                     created_at: row.get(3)?,
@@ -101,14 +101,14 @@ impl UserRepositoryPort for SqliteUserRepository {
         let users = stmt
             .query_map(params_refs.as_slice(), |row| {
                 Ok(User {
-                    id: Some(row.get(0)?),
+                    id: row.get(0)?,
                     name: row.get(1)?,
                     email: row.get(2)?,
                     created_at: row.get(3)?,
                     updated_at: row.get(4)?,
                 })
             })?
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Result<Vec<User>, rusqlite::Error>>()?;
 
         Ok(users)
     }
@@ -122,17 +122,32 @@ impl UserRepositoryPort for SqliteUserRepository {
         {
             let conn = self.conn.lock().unwrap();
 
+            let mut update_clauses = vec![];
+            let mut params: Vec<Box<dyn rusqlite::ToSql>> = vec![];
+
             if let Some(name) = name {
-                conn.execute(
-                    "UPDATE users SET name = ?1, updated_at = CURRENT_TIMESTAMP WHERE id = ?2",
-                    &[name, &id.to_string()],
-                )?;
+                update_clauses.push("name = ?");
+                params.push(Box::new(name));
             }
             if let Some(email) = email {
-                conn.execute(
-                    "UPDATE users SET email = ?1, updated_at = CURRENT_TIMESTAMP WHERE id = ?2",
-                    &[email, &id.to_string()],
-                )?;
+                update_clauses.push("email = ?");
+                params.push(Box::new(email));
+            }
+
+            if !update_clauses.is_empty() {
+                update_clauses.push("updated_at = CURRENT_TIMESTAMP");
+
+                let query = format!(
+                    "UPDATE users SET {} WHERE id = ?",
+                    update_clauses.join(", ")
+                );
+
+                params.push(Box::new(id));
+
+                let params_refs: Vec<&dyn rusqlite::ToSql> =
+                    params.iter().map(|p| p.as_ref()).collect();
+
+                conn.execute(&query, params_refs.as_slice())?;
             }
         }
 
@@ -141,7 +156,7 @@ impl UserRepositoryPort for SqliteUserRepository {
 
     fn delete(&self, id: i64) -> Result<(), Box<dyn Error>> {
         let conn = self.conn.lock().unwrap();
-        conn.execute("DELETE FROM users WHERE id = ?1", [id])?;
+        conn.execute("DELETE FROM users WHERE id = ?", [id])?;
         Ok(())
     }
 }
